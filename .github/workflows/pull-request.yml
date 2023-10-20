@@ -18,7 +18,7 @@ jobs:
         id: make_pr_body
         run: |
           PR_DESCRIPTION=$(git log origin/master..origin/${GITHUB_REF_NAME} --no-merges --no-decorate)
-          TITLE='Result of linter PEP8: ${{ steps.run_linters.outcome }}'$'\n''This is diff comments for branch [master] and ['${GITHUB_REF_NAME}$']\n'
+          TITLE='This is diff comments for branch [master] and ['${GITHUB_REF_NAME}$']\n'
           PR_DESCRIPTION=$TITLE$PR_DESCRIPTION
           echo 'PR_DESCRIPTION<<EOF' >> $GITHUB_ENV
           echo "$PR_DESCRIPTION" >> $GITHUB_ENV
