@@ -39,4 +39,4 @@ jobs:
           PULL_REQUEST_UPDATE: set
           PULL_REQUEST_BODY: ${{ env.PR_DESCRIPTION }}
           PULL_REQUEST_ASSIGNEES: zvic81
-          PULL_REQUEST_REVIEWERS: css-ilgol zvic81 #there must be css-ilgol only
+          PULL_REQUEST_REVIEWERS: css-ilgol, zvic81 #there must be css-ilgol only
