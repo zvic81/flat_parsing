@@ -26,15 +26,19 @@ public class DataInitializer {
         this.addresRepo = addresRepo;
     }
     public void initializeData() throws IOException, URISyntaxException {
-        JsonDeserializer jsonDeserializer = new JsonDeserializer();
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(addresRepo);
         String fileContent = new String(Files.readAllBytes(Paths.get("src/main/resources/payload.json")));
-        List <Address>  addresses = jsonDeserializer.getAddressesFromJson(fileContent);
-        for (Address adr: addresses) {
-            String formattedAddress = adr.getFormattedAddress();
-            Address existingAddress = addresRepo.findFirstByFormattedAddress(formattedAddress);
-            if (existingAddress == null) {
-                addresRepo.save(adr); // save only unique address
-            }
+//        List <Address>  addresses = jsonDeserializer.getAddressesFromJson(fileContent);
+//        for (Address adr: addresses) {
+//            String formattedAddress = adr.getFormattedAddress();
+//            Address existingAddress = addresRepo.findFirstByFormattedAddress(formattedAddress);
+//            if (existingAddress == null) {
+//                addresRepo.save(adr); // save only unique address
+//            }
+//        }
+        List <Flat> flats = jsonDeserializer.getFlatFromJson(fileContent);
+//        for (Flat flat: flats) System.out.println(flat);
+        flatRepo.saveAll(flats);
     }
 
 

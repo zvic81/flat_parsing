@@ -1,7 +1,7 @@
 package com.example.flatparsing.controller;
 
 import java.util.List;
-
+/*
 public class Person {
     private String name;
     private Integer age;
@@ -40,4 +40,4 @@ public class Person {
     }
 
     private List<String> skillList;
-}
+}*/
