@@ -1,6 +1,7 @@
 package com.example.flatparsing.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.example.flatparsing.model.json.AvitoResult;
+import com.example.flatparsing.model.json.Item;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
@@ -22,124 +23,24 @@ public class JsonDeserializer {
         this.addresRepo = addresRepo;
     }
 
-    public List<Address> getAddressesFromJson(String jsonBody) throws IOException {
-            List<Address> addressList = new ArrayList<>();
-            JsonNode rootNode = objectMapper.readTree(jsonBody);
-            JsonNode itemsNode = rootNode.get("items");
-            if (itemsNode != null && itemsNode.isArray()) {
-                for (JsonNode itemNode : itemsNode) {
-                    JsonNode geoNode = itemNode.get("geo");
-                    if (geoNode != null) {
-                        JsonNode formattedAddressNode = geoNode.get("formattedAddress");
-                        if (formattedAddressNode != null) {
-                            String formattedAddress = formattedAddressNode.asText();
-//                            System.out.println("formattedAddress: " + formattedAddress);
-                            Address address = new Address(formattedAddress);
-                            addressList.add(address);
-                        }
-                    }
-                }
-            }
-    return addressList;
-    }
     public List<Flat> getFlatFromJson(String jsonBody) throws IOException {
         List <Flat> flatList = new ArrayList<>();
-        JsonNode rootNode = objectMapper.readTree(jsonBody);
-        JsonNode itemsNode = rootNode.get("items");
-        if (itemsNode != null && itemsNode.isArray()) {
-            for (JsonNode itemNode : itemsNode) {
-                Flat flat = new Flat();
-                flat.setId_avito(itemNode.get("id").asLong());
-                flat.setTitle(itemNode.get("title").asText());
-                flat.setDescription(itemNode.get("description").asText());
-                flat.setCurrent_price(itemNode.get("priceDetailed").get("string").asLong());
-                flat.setDeleted(false);
-                String formattedAddress = itemNode.get("geo").get("formattedAddress").asText();
-                Address address = addresRepo.findFirstByFormattedAddress(formattedAddress);
-                flat.setAddress(address);
-
-                flatList.add(flat);
+        AvitoResult avitoResult = objectMapper.readValue(jsonBody, AvitoResult.class);
+        for (Item item: avitoResult.getItems()) {
+            Flat flat = new Flat();
+            String formattedAddress = item.getGeo().getFormattedAddress();
+            Address existingAddress = addresRepo.findFirstByFormattedAddress(formattedAddress);
+            if (existingAddress == null) {
+                existingAddress = new Address(formattedAddress);
+                addresRepo.save(existingAddress); // save only unique address
             }
+            flat.setAddress(existingAddress);
+            flat.setCurrent_price(Long.parseLong(item.getPriceDetailed().getString()));
+            flat.setId_avito(item.getId());
+            flat.setDescription(item.getDescription());
+            flat.setTitle(item.getTitle());
+            flatList.add(flat);
         }
-        return flatList;
-
+       return flatList;
     }
    }
-
-/**
- * import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
- * import com.fasterxml.jackson.annotation.JsonProperty;
- *
- * @JsonIgnoreProperties(ignoreUnknown = true)
- * public class Flat {
- *     @JsonProperty("id")
- *     private long id;
- *
- *     @JsonProperty("categoryId")
- *     private int categoryId;
- *
- *     @JsonProperty("locationId")
- *     private int locationId;
- *
- *     @JsonProperty("title")
- *     private String title;
- *
- *     @JsonProperty("description")
- *     private String description;
- *
- *     @JsonProperty("priceDetailed")
- *     private Price priceDetailed;
- *
- *     @JsonProperty("geo")
- *     private Geo geo;
- *
- *     public long getId() {
- *         return id;
- *     }
- *
- *     public int getCategoryId() {
- *         return categoryId;
- *     }
- *
- *     public int getLocationId() {
- *         return locationId;
- *     }
- *
- *     public String getTitle() {
- *         return title;
- *     }
- *
- *     public String getDescription() {
- *         return description;
- *     }
- *
- *     public String getPrice() {
- *         return priceDetailed.getFullString();
- *     }
- *
- *     public String getFormattedAddress() {
- *         return geo.getFormattedAddress();
- *     }
- * }
- *
- * class Price {
- *     @JsonProperty("fullString")
- *     private String fullString;
- *
- *     public String getFullString() {
- *         return fullString;
- *     }
- * }
- *
- * class Geo {
- *     @JsonProperty("formattedAddress")
- *     private String formattedAddress;
- *
- *     public String getFormattedAddress() {
- *         return formattedAddress;
- *     }
- * }
- *
- *
- *
- */

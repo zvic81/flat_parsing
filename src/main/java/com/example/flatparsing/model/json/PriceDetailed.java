@@ -5,10 +5,6 @@ import lombok.Getter;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Item {
-    Geo geo;
-    PriceDetailed priceDetailed;
-    Long id;
-    String title;
-    String description;
+public class PriceDetailed {
+    String string;
 }
