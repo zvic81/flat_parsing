@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 
 @Component
 public class DataInitializer {
-    private final FlatRepo flatRepo;
+ /*   private final FlatRepo flatRepo;
     private final AddresRepo addresRepo;
 
     @Autowired
@@ -28,16 +28,7 @@ public class DataInitializer {
     public void initializeData() throws IOException, URISyntaxException {
         JsonDeserializer jsonDeserializer = new JsonDeserializer(addresRepo);
         String fileContent = new String(Files.readAllBytes(Paths.get("src/main/resources/payload.json")));
-//        List <Address>  addresses = jsonDeserializer.getAddressesFromJson(fileContent);
-//        for (Address adr: addresses) {
-//            String formattedAddress = adr.getFormattedAddress();
-//            Address existingAddress = addresRepo.findFirstByFormattedAddress(formattedAddress);
-//            if (existingAddress == null) {
-//                addresRepo.save(adr); // save only unique address
-//            }
-//        }
         List <Flat> flats = jsonDeserializer.getFlatFromJson(fileContent);
-//        for (Flat flat: flats) System.out.println(flat);
         flatRepo.saveAll(flats);
     }
 
@@ -50,5 +41,5 @@ public class DataInitializer {
             throw new RuntimeException(e);
         }
     }
-
+*/
 }
