@@ -39,21 +39,24 @@ public class UserController {
     @GetMapping("/db/get")
     public ResponseEntity<String> syncFlatsFromExternalApi() {
         ExternalApiHandler externalApiHandler = new ExternalApiHandler();
-        List <String> jsonFromApi = null;
+        List<String> jsonFromApi = null;
+
         try {
-            jsonFromApi = externalApiHandler.GetJsonFromApi();
+            jsonFromApi = externalApiHandler.getJsonFromApi();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-            JsonDeserializer jsonDeserializer = new JsonDeserializer(dbService);
+
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(dbService);
+
         try {
-            for (String reader: jsonFromApi) {
-                dbService.saveFlatsToDB(jsonDeserializer.getFlatFromJson(reader));
+            for (String reader : jsonFromApi) {
+                dbService.saveOrUpdateFlatsInDB(jsonDeserializer.getFlatFromJson(reader));
             }
         } catch (JsonProcessingException e) {
             return new ResponseEntity<>("Data synchronized failed", HttpStatus.INTERNAL_SERVER_ERROR);
-//            throw new RuntimeException(e);
         }
+        dbService.setDeletedFlats();
         System.out.println("Data loaded in DB successful");
         return new ResponseEntity<>("Data synchronized successful", HttpStatus.OK);
     }

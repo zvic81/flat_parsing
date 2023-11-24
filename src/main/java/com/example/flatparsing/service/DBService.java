@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class DBService {
@@ -25,10 +26,39 @@ public class DBService {
         return all;
     }
 
-    public char saveFlatsToDB(List<Flat> flats){
-        flatRepo.saveAll(flats);
+    public char saveOrUpdateFlatsInDB(List<Flat> flats){
+        for (Flat flat: flats) {
+            Flat flatFromBD = flatRepo.findFirstByIdAvitoAndLattitudeAndLongitude(flat.getIdAvito(), flat.getLattitude(), flat.getLongitude()).orElse(null);
+            if (flatFromBD == null) { //no same flat in DB
+                flat.setUpdated((byte)1);
+                flatRepo.save(flat);
+                System.out.println("flat saved in DB: "+flat.getId());
+            } else {
+                if (flatFromBD.getCurrent_price() != flat.getCurrent_price()) flatFromBD.setCurrent_price(flat.getCurrent_price());
+                if (!Objects.equals(flatFromBD.getDescription(), flat.getDescription())) flatFromBD.setDescription(flat.getDescription());
+                if (!Objects.equals(flatFromBD.getTitle(), flat.getTitle())) flatFromBD.setTitle(flat.getTitle());
+                flatFromBD.setUpdated((byte)1);
+                flatRepo.save(flatFromBD);
+                System.out.println("flat's updated "+flatFromBD.getId());
+            }
+        }
+         return 0;
+    }
+    public char setDeletedFlats(){
+        List<Flat> allFlats = flatRepo.findAll();
+        for (Flat flat : allFlats) {
+            if (flat.getUpdated() == 0) {
+                flat.setDeleted((byte) 1);
+                System.out.println("deleted flat: "+flat.getId());
+            }
+            flat.setUpdated((byte) 0);
+        }
+        flatRepo.saveAll(allFlats);
+        System.out.println("set deleted finished");
         return 0;
     }
+
+
     public Address getAddressFromDB(String formattedAddress){
         return addresRepo.findFirstByFormattedAddress(formattedAddress);
     }
@@ -38,23 +68,3 @@ public class DBService {
         return 0;
     }
 }
-
-
-
-/**
-Service
-public class UserService {
-    private final UserRepository userRepository;
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-    public AppUser getUserById(Long id){
-        System.out.println("id getUserById=" + id);
-        return userRepository.findById(id).orElse(null);
-    }
-    public List<AppUser> getAllUsers(){
-        return userRepository.findAll();
-    }
-}
- */

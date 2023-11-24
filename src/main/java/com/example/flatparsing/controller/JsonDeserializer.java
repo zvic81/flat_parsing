@@ -5,8 +5,7 @@ import com.example.flatparsing.model.json.Item;
 import com.example.flatparsing.service.DBService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.sql.SQLOutput;
+
 import java.util.List;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.flatparsing.model.Address;
 import com.example.flatparsing.model.Flat;
-
-import static java.util.Collections.replaceAll;
 
 @Service
 public class JsonDeserializer {
@@ -41,9 +38,11 @@ public class JsonDeserializer {
             flat.setAddress(existingAddress);
             String currentPrice = item.getPriceDetailed().getString();
             flat.setCurrent_price(Long.parseLong(currentPrice.replaceAll("[^\\d]", "")));
-            flat.setId_avito(item.getId());
+            flat.setIdAvito(item.getId());
             flat.setDescription(item.getDescription());
             flat.setTitle(item.getTitle());
+            flat.setLongitude(avitoResult.getLon());
+            flat.setLattitude(avitoResult.getLat());
             flatList.add(flat);
         }
        return flatList;

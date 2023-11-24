@@ -6,6 +6,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ExternalApiHandler {
     //        67.53199529502717   33.32436711542188 67.58337256719041 33.526927540226566 ---area covering the entire city of Apatity
@@ -16,7 +17,7 @@ public class ExternalApiHandler {
     private static final double MAP_STEP_LAT = (LAT_TOP - LAT_BOTTOM)/3;
     private static final double MAP_STEP_LON = (LON_RIGHT - LON_LEFT)/3;
 
-    public  List<String> GetJsonFromApi() throws InterruptedException {
+    public  List<String> getJsonFromApi() throws InterruptedException {
         List<String> resultString = new ArrayList<>();
         for (int x = 0; x < 3; x++) {
             double latBottomCurr = LAT_BOTTOM + MAP_STEP_LAT * x;
@@ -58,11 +59,15 @@ public class ExternalApiHandler {
                         .accept(MediaType.APPLICATION_JSON)
                         .retrieve()
                         .bodyToMono(String.class);
-                resultString.add(response.block());
+                String append = ", \"lat\":" + (latBottomCurr+latTopCurr)/2 + ", \"lon\":" + (lonLeftCurr+lonRightCurr)/2 + "}";
+                String ss = response.block();
+                int length = ss.length();
+                if (length>0) {
+                    resultString.add(ss.substring(0, length - 1) + append);
+                }
             }
         }
         return resultString;
-
 
     }
 }
