@@ -45,13 +45,14 @@ public class DBService {
     }
     public char setDeletedFlats(){
         List<Flat> allFlats = flatRepo.findAll();
-        for (Flat flat : allFlats) {
-            if (flat.getUpdated() == 0) {
-                flat.setDeleted((byte) 1);
-                System.out.println("deleted flat: "+flat.getId());
-            }
-            flat.setUpdated((byte) 0);
-        }
+        allFlats.stream()
+                .filter(flat -> flat.getUpdated() == 0)
+                .peek(flat -> {
+                    flat.setDeleted((byte) 1);
+                    System.out.println("deleted flat: " + flat.getId());
+                })
+                .forEach(flat -> flat.setUpdated((byte) 0));
+
         flatRepo.saveAll(allFlats);
         System.out.println("set deleted finished");
         return 0;
