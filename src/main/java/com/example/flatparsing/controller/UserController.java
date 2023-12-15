@@ -26,22 +26,21 @@ public class UserController {
     }
 
     @GetMapping("/db/all")
-    public ResponseEntity<?> getFlatsFromDatabase() {
+    public ResponseEntity<List<Flat>> getFlatsFromDatabase() {
         List<Flat> flats = dbService.getAllFlats();
-        StringBuilder sb = new StringBuilder();
-        for (Flat f: flats) sb.append(f.toString());
-        return new ResponseEntity<>(sb, HttpStatus.OK);
+        return ResponseEntity.ok(flats);
     }
 
     @GetMapping("/db/get")
-    public ResponseEntity<String> syncFlatsFromExternalApi() {
+    public ResponseEntity<Response> syncFlatsFromExternalApi() {
         ExternalApiHandler externalApiHandler = new ExternalApiHandler();
-        List<String> jsonFromApi = null;
+        List<String> jsonFromApi;
 
         try {
             jsonFromApi = externalApiHandler.getJsonFromApi();
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Response response = new Response("error", "An error occurred while processing the request");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
 
         JsonDeserializer jsonDeserializer = new JsonDeserializer(dbService);
@@ -51,10 +50,12 @@ public class UserController {
                 dbService.saveOrUpdateFlatsInDB(jsonDeserializer.getFlatFromJson(reader));
             }
         } catch (JsonProcessingException e) {
-            return new ResponseEntity<>("Data synchronized failed", HttpStatus.INTERNAL_SERVER_ERROR);
+            Response response = new Response("error", "Data synchronized failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
         dbService.setDeletedFlats();
         System.out.println("Data loaded in DB successful");
-        return new ResponseEntity<>("Data synchronized successful", HttpStatus.OK);
+        Response response = new Response("ok", "Data synchronized successful");
+        return ResponseEntity.ok().body(response);
     }
 }

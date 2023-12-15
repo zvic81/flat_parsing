@@ -1,12 +1,18 @@
 package com.example.flatparsing.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
 import java.util.Date;
 
 @Getter
 @Setter
+@ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name= "Flat", schema = "public")
 public class Flat
@@ -14,6 +20,7 @@ public class Flat
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "address_id")
     private Address address;
@@ -48,23 +55,6 @@ public class Flat
         this.title = title;
         this.description = description;
     }
-
-    @Override
-    public String toString() {
-        return "Flat{" +
-                "id=" + id +
-                ", address=" + address +
-                ", id_avito=" + idAvito +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", current_price=" + current_price +
-                ", creationDate=" + creationDate +
-                ", lattitude=" + lattitude +
-                ", longitude=" + longitude +
-                ", deleted=" + deleted +
-                '}';
-    }
-
 
     @PrePersist
     protected void onCreate() {
