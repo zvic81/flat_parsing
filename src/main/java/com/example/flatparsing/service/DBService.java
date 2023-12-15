@@ -1,14 +1,13 @@
 package com.example.flatparsing.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Objects;
 import com.example.flatparsing.model.Address;
 import com.example.flatparsing.model.Flat;
 import com.example.flatparsing.repo.AddresRepo;
 import com.example.flatparsing.repo.FlatRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Objects;
 
 @Service
 public class DBService {
@@ -57,7 +56,6 @@ public class DBService {
         System.out.println("set deleted finished");
         return 0;
     }
-
 
     public Address getAddressFromDB(String formattedAddress){
         return addresRepo.findFirstByFormattedAddress(formattedAddress);

@@ -3,10 +3,9 @@ package com.example.flatparsing.service;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
 
 public class ExternalApiHandler {
     //        67.53199529502717   33.32436711542188 67.58337256719041 33.526927540226566 ---area covering the entire city of Apatity

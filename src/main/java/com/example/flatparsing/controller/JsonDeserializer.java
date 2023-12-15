@@ -1,11 +1,7 @@
 package com.example.flatparsing.controller;
 
-import com.example.flatparsing.model.json.AvitoResult;
-import com.example.flatparsing.model.json.Item;
-import com.example.flatparsing.service.DBService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.flatparsing.model.Address;
 import com.example.flatparsing.model.Flat;
+import com.example.flatparsing.model.json.AvitoResult;
+import com.example.flatparsing.model.json.Item;
+import com.example.flatparsing.service.DBService;
 
 @Service
 public class JsonDeserializer {

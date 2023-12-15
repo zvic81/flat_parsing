@@ -1,6 +1,5 @@
 package com.example.flatparsing.controller;
 
-//import com.example.flatparsing.repo.FlatRepo;
 import com.example.flatparsing.service.ExternalApiHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-//import java.util.Collections;
 import java.util.List;
 import com.example.flatparsing.model.Flat;
 import com.example.flatparsing.service.DBService ;
