@@ -1,9 +1,11 @@
 package com.example.flatparsing.controller;
 
+import com.example.flatparsing.service.ExternalApiHandler;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import com.example.flatparsing.model.Flat;
@@ -13,6 +15,7 @@ import com.example.flatparsing.service.DBService ;
 public class UserController {
     private final DBService dbService;
 
+    @Autowired
     public UserController(DBService dbService) {
         this.dbService = dbService;
     }
@@ -22,13 +25,37 @@ public class UserController {
         return "Hello my dear friend";
     }
 
-    @GetMapping("/db")
-    public ResponseEntity<?> getFlatsFromDatabase() {
+    @GetMapping("/db/all")
+    public ResponseEntity<List<Flat>> getFlatsFromDatabase() {
         List<Flat> flats = dbService.getAllFlats();
-        StringBuilder sb = new StringBuilder();
-        for (Flat f: flats) sb.append(f.toString());
-        return new ResponseEntity<>(sb, HttpStatus.OK);
+        return ResponseEntity.ok(flats);
     }
 
-}
+    @GetMapping("/db/get")
+    public ResponseEntity<Response> syncFlatsFromExternalApi() {
+        ExternalApiHandler externalApiHandler = new ExternalApiHandler();
+        List<String> jsonFromApi;
 
+        try {
+            jsonFromApi = externalApiHandler.getJsonFromApi();
+        } catch (InterruptedException e) {
+            Response response = new Response("error", "An error occurred while processing the request");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(dbService);
+
+        try {
+            for (String reader : jsonFromApi) {
+                dbService.saveOrUpdateFlatsInDB(jsonDeserializer.getFlatFromJson(reader));
+            }
+        } catch (JsonProcessingException e) {
+            Response response = new Response("error", "Data synchronized failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        dbService.setDeletedFlats();
+        System.out.println("Data loaded in DB successful");
+        Response response = new Response("ok", "Data synchronized successful");
+        return ResponseEntity.ok().body(response);
+    }
+}

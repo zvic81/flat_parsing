@@ -1,0 +1,42 @@
+name: Pull Request to [master]
+on:
+  push:
+    branches-ignore:
+      - 'master'
+jobs:
+  pull_request:
+    name: PullRequestAction
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
+
+
+      - name: Set branch name
+        run: |
+          TITLE='Create new pull request from branch ['${GITHUB_REF_NAME}$'] to [master]'
+          echo "PULL_REQUEST_TITLE=$TITLE" >> $GITHUB_ENV
+
+
+      - name: Make PR body
+        id: make_pr_body
+        run: |
+          PR_DESCRIPTION=$(git log origin/master..origin/${GITHUB_REF_NAME} --no-merges --no-decorate)
+          TITLE='This is diff comments for branch [master] and ['${GITHUB_REF_NAME}$']\n'
+          PR_DESCRIPTION=$TITLE$PR_DESCRIPTION
+          echo 'PR_DESCRIPTION<<EOF' >> $GITHUB_ENV
+          echo "$PR_DESCRIPTION" >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+
+      - name: pull_request_action
+        uses: vsoch/pull-request-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_REQUEST_BRANCH: "master"
+          PULL_REQUEST_UPDATE: set
+          PULL_REQUEST_BODY: ${{ env.PR_DESCRIPTION }}
+          PULL_REQUEST_ASSIGNEES: zvic81
+          PULL_REQUEST_REVIEWERS: css-ilgol, zvic81 #there must be css-ilgol only
